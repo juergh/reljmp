@@ -21,7 +21,9 @@
 
 #include "reljmp.h"
 
-#define VERBOSE 1
+static int verbose = 1;
+module_param(verbose, int, S_IRUGO|S_IWUSR);
+MODULE_PARM_DESC(verbose, "Verbose output (default = 1)");
 
 extern struct reljmp rj_printk;
 
@@ -49,7 +51,7 @@ static int __init reljmp_module_init(void)
 
 	/* Register the jumps */
 	for (i = 0; i < ARRAY_SIZE(reljmp_func); i++) {
-		reljmp_register(reljmp_func[i], VERBOSE);
+		reljmp_register(reljmp_func[i], verbose);
 	}
 
 	printk("reljmp: module loaded\n");
@@ -62,7 +64,7 @@ static void __exit reljmp_module_exit(void)
 
 	/* Unregister the jumps */
 	for (i = 0; i < ARRAY_SIZE(reljmp_func); i++) {
-		reljmp_unregister(reljmp_func[i], VERBOSE);
+		reljmp_unregister(reljmp_func[i], verbose);
 	}
 
 	printk("reljmp: module unloaded\n");
