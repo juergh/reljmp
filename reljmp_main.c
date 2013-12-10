@@ -25,20 +25,32 @@
 
 extern struct reljmp rj_printk;
 
+/* List of functions to replace */
+struct reljmp *reljmp_func[] = {
+	&rj_printk,
+};
+
 static int __init reljmp_module_init(void)
 {
 	int retval;
+	int i;
 
-	/* Initialize the jump(s) */
+	/* Initialize the jumps */
 	retval = reljmp_init_once();
-	if (retval)
+	if (retval) {
 		return retval;
-	retval = reljmp_init(&rj_printk);
-	if (retval)
-		return retval;
+	}
+	for (i = 0; i < ARRAY_SIZE(reljmp_func); i++) {
+		retval = reljmp_init(reljmp_func[i]);
+		if (retval) {
+			return retval;
+		}
+	}
 
-	/* Register the jump(s) */
-	reljmp_register(&rj_printk, VERBOSE);
+	/* Register the jumps */
+	for (i = 0; i < ARRAY_SIZE(reljmp_func); i++) {
+		reljmp_register(reljmp_func[i], VERBOSE);
+	}
 
 	printk("reljmp: module loaded\n");
 	return 0;
@@ -46,8 +58,12 @@ static int __init reljmp_module_init(void)
 
 static void __exit reljmp_module_exit(void)
 {
+	int i;
+
 	/* Unregister the jumps */
-	reljmp_unregister(&rj_printk, VERBOSE);
+	for (i = 0; i < ARRAY_SIZE(reljmp_func); i++) {
+		reljmp_unregister(reljmp_func[i], VERBOSE);
+	}
 
 	printk("reljmp: module unloaded\n");
 }
