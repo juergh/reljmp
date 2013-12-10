@@ -17,11 +17,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <linux/kallsyms.h>
 #include <linux/module.h>
 
 #include "reljmp.h"
 
-/* This is our function that replaces the kernel's original printk() */
+/* Example:
+ * static int (*reljmp_unexported_func)(int, void *); */
+
+/* Init handler which is used to lookup addresses of symbols that the
+ * replacement function requires but are not exported to modules */
+static int reljmp_printk_init_handler(void)
+{
+	/* Example:
+	 * RELJMP_LOOKUP_FUNC(unexported_func); */
+	return 0;
+}
+
+/* This is our function that replaces the kernel's original printk()
+ * Use __attribute__ ((used)) or it will get optimized away :-) */
 static int __attribute__ ((used)) reljmp_printk(const char *fmt, ...)
 {
 	va_list args;
@@ -33,14 +47,10 @@ static int __attribute__ ((used)) reljmp_printk(const char *fmt, ...)
 	r = vprintk(fmt, args);
 	va_end(args);
 
-	return r;
-}
+	/* Example:
+	 * int_val = reljmp_unexported_func(int arg1, void *arg2); */
 
-/* Dummy init handler. Can be used to lookup addresses of symbols that our
- * replacement function requires but which are not exported to modules */
-int reljmp_init_handler(void)
-{
-	return 0;
+	return r;
 }
 
 /* Set up the jump structure. All that's required is:
@@ -52,5 +62,5 @@ int reljmp_init_handler(void)
 struct reljmp rj_printk = {
 	.from_symbol_name = "printk",
         .to_symbol_name = "reljmp_printk",
-        .init_handler = reljmp_init_handler,
+        .init_handler = reljmp_printk_init_handler,
 };
