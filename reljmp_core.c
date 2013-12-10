@@ -110,9 +110,9 @@ int reljmp_init_once(void)
 {
 	printk("reljmp: initialize\n");
 
-	RELJMP_LOOKUP(jump_label_mutex, (struct mutex *));
-	RELJMP_LOOKUP(text_mutex, (struct mutex *));
-	RELJMP_LOOKUP(text_poke_smp, (void *));
+	RELJMP_LOOKUP_TYPE(jump_label_mutex, (struct mutex *));
+	RELJMP_LOOKUP_TYPE(text_mutex, (struct mutex *));
+	RELJMP_LOOKUP_FUNC(text_poke_smp);
 
 	return 0;
 }

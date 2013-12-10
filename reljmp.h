@@ -41,7 +41,7 @@ void reljmp_register(struct reljmp *, int);
 int reljmp_init(struct reljmp *);
 int reljmp_init_once(void);
 
-#define RELJMP_LOOKUP(name, type) \
+#define RELJMP_LOOKUP_TYPE(name, type) \
 	{ \
 		unsigned long __addr = kallsyms_lookup_name(#name); \
 		if (!__addr) { \
@@ -52,5 +52,7 @@ int reljmp_init_once(void);
 		reljmp_##name = type __addr ; \
 		printk("reljmp: %s @ 0x%p\n", #name, (void *)__addr); \
 	}
+
+#define RELJMP_LOOKUP_FUNC(name) RELJMP_LOOKUP_TYPE(name, (void *))
 
 #endif /* __RELJMP__ */
