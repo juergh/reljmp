@@ -14,8 +14,8 @@ because that's what was running on the system where I had to do this. If you
 need this for a different kernel, you might want to check the kprobes code to
 verify that the approach is still valid.
 
-In general, for every kernel function that you want to replace, you want to
-create a separate file reljmp_<function name>.c (use reljmp_printk.c as a
+In general, for every kernel function that you need to replace, you want to
+create a separate file reljmp_\<function name\>.c (use reljmp_printk.c as a
 starting point), add the the name of the reljmp struct (rj_printk in the
 example) to the reljmp_func[] array in reljmp_main.c and update the Makefile.
 That's it. Easy, ain't it? :-)
